@@ -1,0 +1,105 @@
+from adressbook import AddressBook, Record
+
+def parse_input(user_input):
+    parts = user_input.split()
+    command = parts[0]
+    args = parts[1:]
+    return command, args
+
+def input_error(handler):
+    def wrapper(*args, **kwargs):
+        try:
+            return handler(*args, **kwargs)
+        except ValueError as e:
+            return str(e)
+        except IndexError:
+            return "Error: Not enough arguments provided."
+        except KeyError as e:
+            return f"Error: {e} not found."
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
+    return wrapper
+
+@input_error
+def add_contact(args, book):
+    """Функція для додавання контакту."""
+    name = args[0]
+    phone = args[1]
+    record = Record(name)
+    record.add_phone(phone)
+    book.add_record(record)
+    return f"Contact {name} with phone {phone} added."
+
+@input_error
+def change_contact(args, book):
+    """Функція для зміни телефону контакту."""
+    name, old_phone, new_phone = args
+    record = book.find(name)
+    if record:
+        record.edit_phone(old_phone, new_phone)
+        return f"Phone number for {name} changed from {old_phone} to {new_phone}."
+    else:
+        return f"Contact {name} not found."
+
+@input_error
+def show_phone(args, book):
+    """Функція для показу телефонів контакту."""
+    name = args[0]
+    record = book.find(name)
+    if record:
+        return f"Phones for {name}: {', '.join(p.value for p in record.phones)}"
+    else:
+        return f"Contact {name} not found."
+
+@input_error
+def show_all(args, book):
+    """Функція для показу всіх контактів."""
+    return str(book)
+
+@input_error
+def add_birthday(args, book):
+    """Функція для додавання дати народження контакту."""
+    name = args[0]
+    birthday = args[1]
+    record = book.find(name)
+    if record:
+        record.add_birthday(birthday)
+        return f"Birthday for {name} set to {birthday}."
+    else:
+        return f"Contact {name} not found."
+
+@input_error
+def birthdays(args, book):
+    """Функція для показу днів народження на наступному тижні."""
+    upcoming_birthdays = book.get_upcoming_birthdays()
+    return '\n'.join([f"{bd['name']} - {bd['birthday'].strftime('%d.%m.%Y')}" for bd in upcoming_birthdays])
+
+def main():
+    book = AddressBook()
+    print("Welcome to the assistant bot!")
+    while True:
+        user_input = input("Enter a command: ")
+        command, args = parse_input(user_input)
+
+        if command in ["close", "exit"]:
+            print("Good bye!")
+            break
+        elif command == "hello":
+            print("How can I help you?")
+        elif command == "add":
+            print(add_contact(args, book))
+        elif command == "change":
+            print(change_contact(args, book))
+        elif command == "phone":
+            print(show_phone(args, book))
+        elif command == "all":
+            print(show_all(args, book))
+        elif command == "add-birthday":
+            print(add_birthday(args, book))
+        elif command == "birthdays":
+            print(birthdays(args, book))
+        else:
+            print("Invalid command.")
+
+if __name__ == "__main__":
+    main()
