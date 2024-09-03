@@ -69,18 +69,28 @@ class AddressBook(UserDict):
         upcoming_birthdays = []
         for record in self.data.values():
             if record.birthday:
-                next_birthday = record.birthday.value.replace(year=today.year)
+                # Перетворюємо рядок в дату
+                birthday_date = datetime.strptime(record.birthday.value, '%d.%m.%Y').date()
+                next_birthday = birthday_date.replace(year=today.year)
+
                 if next_birthday < today:
                     next_birthday = next_birthday.replace(year=today.year + 1)
 
                 days_until_birthday = (next_birthday - today).days
                 if 0 <= days_until_birthday <= 7:
+                    # Перевірка на вихідні
                     if next_birthday.weekday() in (5, 6):
                         next_birthday += timedelta(days=(7 - next_birthday.weekday()))
 
-                    upcoming_birthdays.append({"name": record.name.value, "birthday": next_birthday})
+                    upcoming_birthdays.append({
+                        "name": record.name.value,
+                        "birthday": next_birthday.strftime('%d.%m.%Y')  # Перетворюємо дату в рядок
+                    })
 
         return upcoming_birthdays
 
+
     def __str__(self):
         return "\n".join(str(record) for record in self.data.values())
+
+

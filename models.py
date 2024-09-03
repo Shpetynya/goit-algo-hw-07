@@ -28,7 +28,6 @@ class Phone(Field):
         """Перевіряє, чи номер телефону складається з 10 цифр."""
         return bool(re.fullmatch(r'\d{10}', phone))
 
-
 class Birthday(Field):
     """Клас для зберігання дати народження."""
     def __init__(self, value):

@@ -90,7 +90,8 @@ def show_birthday(args, book):
 def birthdays(args, book):
     """Функція для показу днів народження на наступному тижні."""
     upcoming_birthdays = book.get_upcoming_birthdays()
-    return '\n'.join([f"{bd['name']} - {bd['birthday'].strftime('%d.%m.%Y')}" for bd in upcoming_birthdays])
+    return '\n'.join([f"{bd['name']} - {bd['birthday']}" for bd in upcoming_birthdays])
+
 
 def main():
     book = AddressBook()
