@@ -32,17 +32,17 @@ class Phone(Field):
 class Birthday(Field):
     """Клас для зберігання дати народження."""
     def __init__(self, value):
-        self.value = value
-        self._validate_and_convert()
+        self.value = value  # Значення зберігається як рядок
+        self._validate()
 
-    def _validate_and_convert(self):
-        """Валідація формату дати та переведення рядка в об'єкт datetime"""
+    def _validate(self):
+        """Валідація формату дати"""
         try:
-            date = datetime.strptime(self.value, '%d.%m.%Y').date()
-            self.value = date
+            # Перевірка формату дати, але не зміна value
+            datetime.strptime(self.value, '%d.%m.%Y')
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
 
     def __str__(self):
         """Для відображення дати у вигляді рядка."""
-        return self.value.strftime('%d.%m.%Y')
+        return self.value  # Повертаємо рядок у вихідному форматі

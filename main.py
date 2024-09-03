@@ -20,15 +20,21 @@ def input_error(handler):
             return f"An unexpected error occurred: {e}"
     return wrapper
 
+
 @input_error
-def add_contact(args, book):
-    """Функція для додавання контакту."""
-    name = args[0]
-    phone = args[1]
-    record = Record(name)
-    record.add_phone(phone)
-    book.add_record(record)
-    return f"Contact {name} with phone {phone} added."
+def add_contact(args, book: AddressBook):
+    name, phone, *_ = args
+    record = book.find(name)
+    message = "Contact updated."
+    if record is None:
+        record = Record(name)
+        book.add_record(record)
+        message = "Contact added."
+    if phone:
+        record.add_phone(phone)
+    return message
+
+
 
 @input_error
 def change_contact(args, book):
@@ -68,6 +74,18 @@ def add_birthday(args, book):
     else:
         return f"Contact {name} not found."
 
+
+@input_error
+def show_birthday(args, book):
+    """Функція для показу дати народження контакту."""
+    name = args[0]
+    record = book.find(name)
+    if record and record.birthday:
+        return f"Birthday for {name}: {record.birthday.value}"
+    else:
+        return f"Birthday for {name} is not set or contact not found."
+
+
 @input_error
 def birthdays(args, book):
     """Функція для показу днів народження на наступному тижні."""
@@ -96,6 +114,8 @@ def main():
             print(show_all(args, book))
         elif command == "add-birthday":
             print(add_birthday(args, book))
+        elif command == "show-birthday":
+            print(show_birthday(args, book))
         elif command == "birthdays":
             print(birthdays(args, book))
         else:
